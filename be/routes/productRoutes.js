@@ -65,5 +65,15 @@ router.post('/', async (req, res) => {
 });
 
 
+router.delete('/', async (req, res) => {
+    try {
+        const reqParams = req.body
+        const products = await Product.deleteOne({ _id: reqParams.id })
+        res.status(200)
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch products', details: error.message });
+    }
+});
+
 
 module.exports = router;

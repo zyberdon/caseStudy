@@ -14,15 +14,20 @@ const InventoryTable = (props) => {
                 method,
                 headers: { 'Content-Type': 'application/json' },
             }
-            if (method === 'POST') {
+            if (method === 'POST' || method === 'DELETE') {
                 options.body = JSON.stringify(reqBody)
             }
             const response = await fetch("http://localhost:5000/api/products", {
                 ...options
             });
             const data = await response.json();
-            setRecords(data);
-            setFilteredRecords(data);
+            if (method !== 'DELETE') {
+                setRecords(data);
+                setFilteredRecords(data);
+            }
+            else {
+                return true
+            }
         } catch (error) {
             props.showToast("Error fetching records:", error);
         }
@@ -38,6 +43,11 @@ const InventoryTable = (props) => {
         setEditedRecord({ ...recordToEdit });
     };
 
+    const handleDelete = (id) => {
+        if (fetchRecords('DELETE', { id: id })) {
+            fetchRecords()
+        }
+    }
     const handleEditChange = (event) => {
         const { name, value } = event.target;
         setEditedRecord((prev) => ({ ...prev, [name]: value }));
@@ -150,6 +160,9 @@ const InventoryTable = (props) => {
                                     <td>{new Date(record['Date']).toLocaleDateString()}</td>
                                     <td>
                                         <button onClick={() => handleEdit(record._id)}>Edit</button>
+                                    </td>
+                                    <td>
+                                        <button onClick={() => handleDelete(record._id)}>Delete</button>
                                     </td>
                                 </>
                             )}
